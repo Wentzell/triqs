@@ -190,8 +190,7 @@ namespace triqs {
 
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A, typename... T>
-    std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                         array_const_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>,
+    std14::conditional_t<std14::decay_t<A>::is_const, array_const_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>,
                          array_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>>
     make_array_proxy(A &&a, std::tuple<T...> const &n) {
       return {std::forward<A>(a), n};
@@ -199,8 +198,8 @@ namespace triqs {
 
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A>
-    std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                         array_const_proxy<details_proxy::_rm_rvalue<A>, long>, array_proxy<details_proxy::_rm_rvalue<A>, long>>
+    std14::conditional_t<std14::decay_t<A>::is_const, array_const_proxy<details_proxy::_rm_rvalue<A>, long>,
+                         array_proxy<details_proxy::_rm_rvalue<A>, long>>
     make_array_proxy(A &&a, long n) {
       return {std::forward<A>(a), n};
     }
@@ -298,8 +297,7 @@ namespace triqs {
 
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A, typename... T>
-    std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                         matrix_const_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>,
+    std14::conditional_t<std14::decay_t<A>::is_const, matrix_const_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>,
                          matrix_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>>
     make_matrix_proxy(A &&a, std::tuple<T...> const &n) {
       return {std::forward<A>(a), n};
@@ -307,8 +305,8 @@ namespace triqs {
 
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A>
-    std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                         matrix_const_proxy<details_proxy::_rm_rvalue<A>, long>, matrix_proxy<details_proxy::_rm_rvalue<A>, long>>
+    std14::conditional_t<std14::decay_t<A>::is_const, matrix_const_proxy<details_proxy::_rm_rvalue<A>, long>,
+                         matrix_proxy<details_proxy::_rm_rvalue<A>, long>>
     make_matrix_proxy(A &&a, long n) {
       return {std::forward<A>(a), n};
     }

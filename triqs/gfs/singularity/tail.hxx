@@ -1257,8 +1257,7 @@ namespace triqs {
     //
     // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
     template <typename A>
-    std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                         __tail_const_view<target_from_array<A, 1>>, __tail_view<target_from_array<A, 1>>>
+    std14::conditional_t<std14::decay_t<A>::is_const, __tail_const_view<target_from_array<A, 1>>, __tail_view<target_from_array<A, 1>>>
     make_tail_view_from_data(A &&a) {
       return {std::forward<A>(a)};
     }

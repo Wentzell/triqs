@@ -177,16 +177,14 @@ namespace arrays {
 
  // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
  template <typename A, typename... T>
- std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                      MAKO_AM_const_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>, MAKO_AM_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>>
+ std14::conditional_t<std14::decay_t<A>::is_const, MAKO_AM_const_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>, MAKO_AM_proxy<details_proxy::_rm_rvalue<A>, std::tuple<T...>>>
  make_MAKO_AM_proxy(A &&a, std::tuple<T...> const &n) {
   return {std::forward<A>(a), n};
  }
 
  // if A is a const_view or A is passed by const &, then the proxy is const, otherwise it is not.
  template <typename A>
- std14::conditional_t<std14::decay_t<A>::is_const || std::is_const<std14::remove_reference_t<A>>::value,
-                      MAKO_AM_const_proxy<details_proxy::_rm_rvalue<A>, long>, MAKO_AM_proxy<details_proxy::_rm_rvalue<A>, long>>
+ std14::conditional_t<std14::decay_t<A>::is_const, MAKO_AM_const_proxy<details_proxy::_rm_rvalue<A>, long>, MAKO_AM_proxy<details_proxy::_rm_rvalue<A>, long>>
  make_MAKO_AM_proxy(A &&a, long n) {
   return {std::forward<A>(a), n};
  }

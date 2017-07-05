@@ -112,8 +112,7 @@ namespace triqs {
     // computing the template parameters of the returned gf, i.e. r_t
     using var_t    = typename mtv::type;   // deduced from the tuple of mesh.
     using target_t = typename G::target_t; // unchanged
-    using r_t =
-        std14::conditional_t<G::is_const or std::is_const<G>::value, gf_const_view<var_t, target_t>, gf_view<var_t, target_t>>;
+    using r_t = std14::conditional_t<G::is_const, gf_const_view<var_t, target_t>, gf_view<var_t, target_t>>;
 
     // compute the sliced view of the data array
     // xs : filter the arguments which are not var_t and compute their linear_index with the corresponding mesh
