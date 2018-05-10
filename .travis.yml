@@ -11,15 +11,15 @@ compiler:
   - clang # Currently failing due to incompatibility with old-abi instructed gcc-7 stdlibc++
 
 before_install:
-  - sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main' -y
+  - sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main' -y
   - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
-  - sudo apt-get install -y --allow-unauthenticated g++-7 clang-5.0
-  - export LIBRARY_PATH=/usr/lib/llvm-5.0/lib:$LIBRARY_PATH
+  - sudo apt-get install -y --allow-unauthenticated g++-7 clang-7
+  - export LIBRARY_PATH=/usr/lib/llvm-7/lib:$LIBRARY_PATH
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 --slave /usr/bin/g++ g++ /usr/bin/g++-7
-  - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-5.0 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-5.0
-  - sudo apt-get install -y --allow-unauthenticated libboost-all-dev cmake git libgfortran3 gfortran openmpi-bin openmpi-common openmpi-doc libopenmpi-dev libblas-dev liblapack-dev libfftw3-dev libgmp-dev hdf5-tools libhdf5-serial-dev python-h5py python-dev python-numpy python-scipy python-jinja2 python-virtualenv python-matplotlib python-tornado python-zmq python-mpi4py python-mako clang-format-5.0 libclang-5.0-dev python-clang-5.0 python-sphinx libjs-mathjax valgrind
+  - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-7 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-7
+  - sudo apt-get install -y --allow-unauthenticated libboost-all-dev cmake git libgfortran3 gfortran openmpi-bin openmpi-common openmpi-doc libopenmpi-dev libblas-dev liblapack-dev libfftw3-dev libgmp-dev hdf5-tools libhdf5-serial-dev python-h5py python-dev python-numpy python-scipy python-jinja2 python-virtualenv python-matplotlib python-tornado python-zmq python-mpi4py python-mako clang-format-7 libclang-7-dev python-clang-7 python-sphinx libjs-mathjax valgrind
 
 install: true
 
