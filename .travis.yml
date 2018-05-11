@@ -4,14 +4,14 @@ branches:
 
 language: cpp
 sudo: required
-dist: trusty
+dist: xenial
 
 compiler:
   - gcc
   - clang # Currently failing due to incompatibility with old-abi instructed gcc-7 stdlibc++
 
 before_install:
-  - sudo add-apt-repository 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty main' -y
+  - sudo add-apt-repository 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial main' -y
   - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
