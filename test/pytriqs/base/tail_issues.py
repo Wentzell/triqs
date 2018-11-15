@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
+import itertools
 import os
 import sys
 
@@ -20,23 +21,37 @@ class test_tail_issues(unittest.TestCase):
         self.assertTrue(err > 1e-2)
 
     def test_multi_fft(self):
+        for tau_iw_scale in [2, 4, 8, 10]:
+            self.multi_fft(tau_iw_scale)
+
+    def multi_fft(self, tau_iw_scale):
         # Init Gf with Single Pole
-        g = GfImFreq(indices = [0,1], beta = 10, n_points = 1000)
+        Nw = 1000
+        g = GfImFreq(indices = [0,1], beta = 10., n_points = Nw)
         g << inverse(iOmega_n + 2.0)
+        g_ref = g.copy()
         
         # Iterate FFT and check violation of G_ij(iw) = G*_ji(-iw)
         it = 100
-        gt = make_gf_from_fourier(g, 10000)
+        gt = make_gf_from_fourier(g, tau_iw_scale * Nw + 1)
         err = np.zeros(it)
+        err_herm = np.zeros(it)
         for i in range(it):
             gt << InverseFourier(g)
             g << Fourier(gt)
-            err[i] = np.linalg.norm(g.data[0,:,:] - np.transpose(np.conj(g.data[-1,:,:])))
+            err[i] = np.max(np.abs(g.data - g_ref.data))
+            err_herm[i] = np.linalg.norm(g.data[0,:,:] - np.transpose(np.conj(g.data[-1,:,:])))
+
         self.assertTrue(np.max(err) < 1e-12)
+        self.assertTrue(np.max(err_herm) < 1e-12)
 
     def test_exact_moments(self):
+        for beta, n_points in itertools.product([1., 10., 100.], [100, 1000, 10000]):
+            self.exact_moments(beta, n_points)
+
+    def exact_moments(self, beta, n_points):
         # Init G with Hermitian Hamiltonian
-        g =  GfImFreq(indices = [0,1], beta = 10, n_points = 1000)
+        g =  GfImFreq(indices = [0,1], beta = 10, n_points = n_points)
         H = np.array([[1.0, 0.1j],[-0.1j, 2.0]])
         g << inverse(iOmega_n - H)
 
