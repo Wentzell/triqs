@@ -230,8 +230,8 @@ namespace triqs::gfs {
    *
    * *-----------------------------------------------------------------------------------------------------*/
 
-  template <int N = 0, typename V, typename T, typename M, int R>
-  auto make_gf_from_fourier(block_gf_const_view<V, T> gin, M const &m, std::vector<array<dcomplex, R>> const &known_moments) {
+  template <int N = 0, typename G, typename M, int R, typename ENABLE_IF = std::enable_if_t<is_block_gf_or_view<G>::value, int>>
+  auto make_gf_from_fourier(G const& gin, M const &m, std::vector<array<dcomplex, R>> const &known_moments) {
 
     using r_t = decltype(make_gf_from_fourier<N>(gin[0], m, known_moments[0]));
     std::vector<r_t> g_vec;
@@ -242,8 +242,8 @@ namespace triqs::gfs {
     return make_block_gf(gin.block_names(), std::move(g_vec));
   }
 
-  template <int N = 0, typename V, typename T, typename M, int R>
-  auto make_gf_from_fourier(block2_gf_const_view<V, T> gin, M const &m, std::vector<std::vector<array<dcomplex, R>>> const &known_moments) {
+  template <int N = 0, typename G, typename M, int R, typename ENABLE_IF = std::enable_if_t<is_block_gf_or_view<G>::value, int>>
+  auto make_gf_from_fourier(G const& gin, M const &m, std::vector<std::vector<array<dcomplex, R>>> const &known_moments) {
 
     using r_t = decltype(make_gf_from_fourier<N>(gin(0,0), m, known_moments[0][0]));
     std::vector<std::vector<r_t>> g_vecvec;
@@ -261,15 +261,9 @@ namespace triqs::gfs {
     return block2_gf{gin.block_names(), std::move(g_vecvec)};
   }
 
-  template <int N = 0, int... Ns, typename V, typename T, typename... Args>
-  auto make_gf_from_fourier(block_gf_const_view<V, T> gin, Args const &... args) {
-    auto l = [&](gf_const_view<V, T> g_bl) { return make_gf_from_fourier<N, Ns...>(make_const_view(g_bl), args...); };
-    return map_block_gf(l, gin);
-  }
-
-  template <int N = 0, int... Ns, typename V, typename T, typename... Args>
-  auto make_gf_from_fourier(block2_gf_const_view<V, T> gin, Args const &... args) {
-    auto l = [&](gf_const_view<V, T> g_bl) { return make_gf_from_fourier<N, Ns...>(make_const_view(g_bl), args...); };
+  template <int N = 0, int... Ns, typename G, typename ENABLE_IF = std::enable_if_t<is_block_gf_or_view<G>::value, int>, typename... Args>
+  auto make_gf_from_fourier(G const & gin, Args const &... args) {
+    auto l = [&](typename G::const_view_type g_bl) { return make_gf_from_fourier<N, Ns...>(make_const_view(g_bl), args...); };
     return map_block_gf(l, gin);
   }
 
