@@ -108,10 +108,12 @@ namespace triqs::gfs {
       auto der_1 = max_element(abs(dat(1, range()) - dat(0, range())) + abs(dat(n_tau - 2, range()) - dat(n_tau - 1, range()))) / gt.mesh().delta();
       auto der_2 =
          0.5 * max_element(abs(dat(2, range()) - dat(0, range())) + abs(dat(n_tau - 3, range()) - dat(n_tau - 1, range()))) / gt.mesh().delta();
-      if (der_1 < 0.95 * der_2 or der_1 > 1.05 * der_2)
-        TRIQS_RUNTIME_ERROR << "ERROR: You seem to be Fourier Transforming an imaginary time Green function with noise (rapidly varying first derivative). Please specify the high-frequency moments as they cannot be deduced.";
-
-      mom_123.rebind(fit_derivatives(gt));
+      if (der_1 < 0.96 * der_2 or der_1 > 1.04 * der_2) {
+        auto km = make_zero_tail(gt, 3);
+        mom_123.rebind(km);
+      } else {
+        mom_123.rebind(fit_derivatives(gt));
+      }
     } else {
       TRIQS_ASSERT2(known_moments.shape()[0] >= 4, " Direct Matsubara Fourier transform requires known moments up to order 3.")
       double _abs_tail0 = max_element(abs(known_moments(0, range())));
