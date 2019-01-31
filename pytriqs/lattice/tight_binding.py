@@ -4,6 +4,8 @@
 # TRIQS: a Toolbox for Research in Interacting Quantum Systems
 #
 # Copyright (C) 2011 by M. Ferrero, O. Parcollet
+# Copyright (C) 2018 The Simons Foundation
+# Author: Hugo U. R. Strand
 #
 # TRIQS is free software: you can redistribute it and/or modify it under the
 # terms of the GNU General Public License as published by the Free Software
@@ -52,7 +54,6 @@ def dos_patch(tight_binding, triangles, n_eps, n_div, name) :
     eps, arr = dos_patch_c(tight_binding, triangles, n_eps, n_div)
     return DOS (eps, arr, name)
 
-# for backward compatibility. Not documented. 
 class TBLattice:
 
     def __init__ (self, units, hopping, orbital_positions = [ (0, 0, 0) ], orbital_names = [""]):
@@ -73,8 +74,6 @@ class TBLattice:
 
     def latt_to_real_x(self, p) : 
         return self.bl.lattice_to_real_coordinates (numpy.array(p, numpy.float64))
-        # modified since array are not converted automatically any more
-        ##return self.bl.lattice_to_real_coordinates (p ) #numpy.array(p.float64))
 
     def hopping_dict(self) : return self._hop
 
@@ -83,4 +82,29 @@ class TBLattice:
 
     #def dos(self) : d = dos (TB, nkpts= 100, neps = 100, name = 'dos2')
 
+    def periodization_matrix(self, n_k):
+        n_k = np.array(n_k)
+        assert( len(n_k) == 3 )
+        assert( n_k.dtype == np.int )
+        periodization_matrix = np.diag(np.array(list(n_k), dtype=np.int32))
+        return periodization_matrix
+    
+    def get_kmesh(self, n_k):
+        return MeshBrillouinZone(self.bz, self.periodization_matrix(n_k))
 
+    def get_rmesh(self, n_k):
+        return MeshCyclicLattice(self.bl, self.periodization_matrix(n_k))
+
+    def on_mesh_brillouin_zone(self, n_k):
+
+        target_shape = [self.NOrbitalsInUnitCell] * 2
+
+        kmesh = self.get_kmesh(n_k)
+
+        e_k = Gf(mesh=kmesh, target_shape=target_shape)
+
+        k_vec = np.array([k.value for k in kmesh])
+        k_vec_rel = np.dot(np.linalg.inv(self.bz.units()).T, k_vec.T).T
+        e_k.data[:] = self.hopping(k_vec_rel.T).transpose(2, 0, 1)
+
+        return e_k
