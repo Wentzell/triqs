@@ -26,26 +26,16 @@ namespace triqs {
 
     namespace { // auxiliary functions
 
-      // a little visitor for reduction to string
-      struct variant_visitor {
-        std::string operator()(int i) const { return "i" + std::to_string(i); }
-        std::string operator()(std::string const &s) const { return "s" + s; }
-      };
-
-      // FIXME : Simplify this ??
-      // decode the string
-      std::variant<int, std::string> string_to_variant(std::string const &s) {
-        switch (s[0]) {
-          case 'i': return std::stoi(s.c_str() + 1); // the variant is an int. Skip the first char and recover the int
-          case 's': return s.c_str() + 1;            // the variant is a string. Just skip the first char
-          default: TRIQS_RUNTIME_ERROR << "Variant indices absent in h5 read";
-        }
+      std::vector<std::string> to_vec_string(indices_t const &f) {
+	std::vector<std::string> v;
+        for (auto const &p : f) { v.emplace_back(std::to_string(
       }
 
       // fundamental_operator_set --> vec vec string
       std::vector<std::vector<std::string>> to_vec_vec_string(fundamental_operator_set const &f) {
         std::vector<std::vector<std::string>> v(f.size());
-        for (auto const &p : f) { // loop over the couple (indices list, number)
+        for (auto const &p : f) { v.emplace_back(to_
+          std::vector<std::string> v
           if (p.linear_index >= f.size()) TRIQS_RUNTIME_ERROR << " Internal error fundamental_operator_set to vec vec string";
           for (auto &x : p.index) v[p.linear_index].push_back(visit(variant_visitor{}, x));
           // variants x are transformed to a string, add 'i' or 's' in front of the string
