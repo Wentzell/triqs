@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 #include <mpi/mpi.hpp>
+#include <triqs/utility/macros.hpp>
 
 #include <gtest/gtest.h>
 #include <numeric>
@@ -63,7 +64,7 @@ TEST(MpiChunk, OMPHybrid) {
   mpi::communicator comm{};
   int sum = 0;
 
-#pragma omp parallel
+ITERTOOLS_omp_parallel
   for (auto i : omp_chunk(mpi::chunk(range(N)))) {
 #pragma omp critical
     {

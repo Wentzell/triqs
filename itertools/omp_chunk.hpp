@@ -41,3 +41,10 @@ namespace itertools {
     return itertools::slice(std::forward<T>(range), start_idx, end_idx);
   }
 } // namespace itertools
+
+#define ITERTOOLS_OMP_PARALLEL								\
+{											\
+  if(const char * __itertools_omp_num_threads = getenv("ITERTOOLS_OMP_NUM_THREADS")) 	\
+    omp_set_num_threads(atoi(__itertools_omp_num_threads));				\
+}											\
+_Pragma("omp parallel")
