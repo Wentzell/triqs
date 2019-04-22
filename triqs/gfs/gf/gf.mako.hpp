@@ -213,12 +213,14 @@ namespace triqs {
       // build a zero from a slice of data
       // MUST be static since it is used in constructors... (otherwise bug in clang)
       template <typename T> static zero_t __make_zero(T, data_t const &d) {
-        auto r = zero_regular_t{d.shape().template front_mpop<arity>()};
-        r()    = 0;
-        return r;
+        if constexpr (std::is_same_v<T, scalar_valued> or std::is_same_v<T, scalar_real_valued>)
+          return 0;
+        else {
+          auto r = zero_regular_t{d.shape().template front_mpop<arity>()};
+          r()    = 0;
+          return r;
+        }
       }
-      static zero_t __make_zero(scalar_valued, data_t const &d) { return 0; }      // special case
-      static zero_t __make_zero(scalar_real_valued, data_t const &d) { return 0; } // special case
       static zero_t _make_zero(data_t const &d) { return __make_zero(Target{}, d); }
       zero_t _remake_zero() { return _zero = _make_zero(_data); } // NOT in constructor...
 
@@ -694,25 +696,26 @@ namespace triqs {
      * Performs MPI scatter
      * @param l The lazy object returned by reduce
      */
-      void operator=(mpi_lazy<mpi::tag::scatter, gf_const_view<Var, Target>> l) {
+  /*    void operator=(mpi_lazy<mpi::tag::scatter, gf_const_view<Var, Target>> l) {
         _mesh = mpi::scatter(l.rhs.mesh(), l.c, l.root);
         _data = mpi::scatter(l.rhs.data(), l.c, l.root, true);
         // mako %if GRV == "regular" :
         _remake_zero();
         // mako %endif
       }
-
+*/
       /**
      * Performs MPI gather
      * @param l The lazy object returned by mpi::reduce
      */
-      void operator=(mpi_lazy<mpi::tag::gather, gf_const_view<Var, Target>> l) {
+   /*   void operator=(mpi_lazy<mpi::tag::gather, gf_const_view<Var, Target>> l) {
         _mesh = mpi::gather(l.rhs.mesh(), l.c, l.root);
         _data = mpi::gather(l.rhs.data(), l.c, l.root, l.all);
         // mako %if GRV == "regular" :
         _remake_zero();
         // mako %endif
       }
+    */
       // mako %endif
     };
     // mako %endfor
