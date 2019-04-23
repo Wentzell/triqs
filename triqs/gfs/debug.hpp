@@ -1,3 +1,5 @@
+#pragma once
+
 // additional functions for debug sections
 
 namespace triqs::gfs {

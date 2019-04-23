@@ -70,3 +70,6 @@
 // fourier
 #include "./gfs/transform/fourier.hpp"
 #include "./gfs/transform/legendre_matsubara.hpp"
+
+// make common template instantiations extern
+#include "./gfs/template_instantiations.hpp"

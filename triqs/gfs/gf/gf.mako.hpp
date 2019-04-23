@@ -222,7 +222,10 @@ namespace triqs {
         }
       }
       static zero_t _make_zero(data_t const &d) { return __make_zero(Target{}, d); }
+
+      // mako %if RVC == 'regular' :
       zero_t _remake_zero() { return _zero = _make_zero(_data); } // NOT in constructor...
+      // mako %endif
 
       template <typename G> MAKO_GF(impl_tag2, G &&x) : _mesh(x.mesh()), _data(x.data()), _zero(_make_zero(_data)), _indices(x.indices()) {}
 
@@ -610,6 +613,7 @@ namespace triqs {
       }
 
       /// Read from HDF5
+      // mako %if RVC != 'const_view' :
       friend void h5_read(h5::group fg, std::string const &subgroup_name, MAKO_GF &g) {
         auto gr       = fg.open_group(subgroup_name);
         auto tag_file = gr.read_hdf5_scheme();
@@ -617,8 +621,9 @@ namespace triqs {
           TRIQS_RUNTIME_ERROR << "h5_read : For a Green function, the type tag should be Gf (or Gfxxxx for old archive) "
                               << " while I found " << tag_file;
         gf_h5_rw<Var, Target>::read(gr, g);
-        g._remake_zero();
+        if constexpr(!is_view) g._remake_zero();
       }
+      // mako %endif
 
       //-----------------------------  BOOST Serialization -----------------------------
       private:

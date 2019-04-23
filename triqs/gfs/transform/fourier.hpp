@@ -162,11 +162,11 @@ namespace triqs::gfs {
    *
    * *-----------------------------------------------------------------------------------------------------*/
 
-  template <int N = 0, typename T> auto make_gf_from_fourier(gf_const_view<brillouin_zone, T> gin) {
+  template <int N = 0, typename T> gf<cyclic_lattice, T> make_gf_from_fourier(gf_const_view<brillouin_zone, T> gin) {
     return make_gf_from_fourier(gin, make_adjoint_mesh(gin.mesh()));
   }
 
-  template <int N = 0, typename T> auto make_gf_from_fourier(gf_const_view<cyclic_lattice, T> gin) {
+  template <int N = 0, typename T> gf<brillouin_zone, T> make_gf_from_fourier(gf_const_view<cyclic_lattice, T> gin) {
     return make_gf_from_fourier(gin, make_adjoint_mesh(gin.mesh()));
   }
 
