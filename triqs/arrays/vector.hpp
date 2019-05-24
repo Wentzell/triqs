@@ -38,14 +38,14 @@ namespace triqs {
     /** */
     template <typename ValueType, char B_S, bool IsConst>
     class vector_view : Tag::vector_view, TRIQS_CONCEPT_TAG_NAME(MutableVector), public IMPL_TYPE {
-      static_assert(B_S=='B' or B_S=='S', "Internal error"); // REPLACE BY STRONG ENUM
+      static_assert(B_S == 'B' or B_S == 'S', "Internal error"); // REPLACE BY STRONG ENUM
       public:
-      using regular_type    = vector<ValueType>;
-      using view_type       = vector_view<ValueType, B_S, false>;
-      using const_view_type = vector_view<ValueType, B_S, true>;
-      //using weak_view_type  = vector_view<ValueType, B_S, true>;
-      using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using storage_type    = typename IMPL_TYPE::storage_type;
+      using regular_type         = vector<ValueType>;
+      using mutable_regular_type = vector<std::remove_const_t<ValueType>>;
+      using view_type            = vector_view<ValueType, B_S, false>;
+      using const_view_type      = vector_view<ValueType, B_S, true>;
+      using indexmap_type        = typename IMPL_TYPE::indexmap_type;
+      using storage_type         = typename IMPL_TYPE::storage_type;
 
       /// Build from an IndexMap and a storage
       template <typename S> vector_view(indexmaps::cuboid::map<1> const &Ind, S const &Mem) : IMPL_TYPE(Ind, Mem) {}
@@ -107,19 +107,20 @@ namespace triqs {
       using type = vector_view<V, B_S, IsConst>;
     };
 
-    template <typename ValueType> using vector_const_view = vector_view<ValueType,'B', true>;
+    template <typename ValueType> using vector_const_view = vector_view<ValueType const, 'B', true>;
 
 // ---------------------- vector--------------------------------
 #define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<1>, nda::mem::handle<ValueType, 'R'>, false, false, 'B', Tag::vector_view>
 
     template <typename ValueType> class vector : Tag::vector, TRIQS_CONCEPT_TAG_NAME(MutableVector), public IMPL_TYPE {
       public:
-      using value_type      = typename IMPL_TYPE::value_type;
-      using storage_type    = typename IMPL_TYPE::storage_type;
-      using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using regular_type    = vector<ValueType>;
-      using view_type       = vector_view<ValueType>;
-      using const_view_type = vector_const_view<ValueType>;
+      using value_type           = typename IMPL_TYPE::value_type;
+      using storage_type         = typename IMPL_TYPE::storage_type;
+      using indexmap_type        = typename IMPL_TYPE::indexmap_type;
+      using regular_type         = vector<ValueType>;
+      using mutable_regular_type = vector<std::remove_const_t<ValueType>>;
+      using view_type            = vector_view<ValueType>;
+      using const_view_type      = vector_const_view<ValueType>;
       //using weak_view_type  = vector_view<ValueType, true>;
 
       /// Empty vector.
@@ -307,14 +308,14 @@ namespace triqs {
 
     template <typename RHS, typename T>
     std::enable_if_t<is_scalar_for<RHS, vector_view<T>>::value> triqs_arrays_compound_assign_delegation(vector_view<T> &lhs, RHS const &rhs,
-                                                                                                          char_<'M'>) {
+                                                                                                        char_<'M'>) {
       T a = rhs;
       blas::scal(a, lhs);
     }
 
     template <typename RHS, typename T>
     std::enable_if_t<is_scalar_for<RHS, vector_view<T>>::value> triqs_arrays_compound_assign_delegation(vector_view<T> &lhs, RHS const &rhs,
-                                                                                                          char_<'D'>) {
+                                                                                                        char_<'D'>) {
       T a = 1 / rhs;
       blas::scal(a, lhs);
     }

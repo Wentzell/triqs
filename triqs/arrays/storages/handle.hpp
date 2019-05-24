@@ -103,15 +103,14 @@ namespace nda::mem {
       deallocate({(char *)_data, _size * sizeof(T)});
     }
 
+    using U = std::remove_const_t<T>;
+
     public:
     using value_type = T;
 
     ~handle() noexcept { decref(); }
 
     handle() = default;
-
-    // Construct by making a clone of the data
-    handle(handle const &x) : handle(handle<T, 'B'>{x}) {}
 
     handle(handle &&x) noexcept {
       _data   = x._data;
@@ -177,11 +176,9 @@ namespace nda::mem {
       }
     }
 
-    // Construct by making a clone of the data
-    handle(handle<T, 'S'> const &x) : handle(handle<T, 'B'>{x}) {}
 
     // Construct by making a clone of the data
-    handle(handle<T, 'B'> const &x) : handle(x.size(), do_not_initialize) {
+    handle(handle<U const, 'B'> const &x) : handle(x.size(), do_not_initialize) {
       if (is_null()) return; // nothing to do for null handle
       if constexpr (std::is_trivially_copyable_v<T>) {
         std::memcpy(_data, x.data(), x.size() * sizeof(T));
@@ -189,6 +186,21 @@ namespace nda::mem {
         for (size_t i = 0; i < _size; ++i) new (_data + i) T(x[i]); // placement new
       }
     }
+
+    // Construct by making a clone of the data
+    handle(handle<U, 'R'>  const &x) : handle(handle<U const, 'B'>{x}) {}
+
+    // Construct by making a clone of the data
+    handle(handle<U, 'S'> const &x) : handle(handle<U const, 'B'>{x}) {}
+
+    // Construct by making a clone of the data
+    handle(handle<U, 'B'> const &x) : handle(handle<U const, 'B'>{x}) {}
+
+    // Construct by making a clone of the data
+    handle(handle<U const, 'R'> const &x) : handle(handle<U const, 'B'>{x}) {}
+
+    // Construct by making a clone of the data
+    handle(handle<U const, 'S'> const &x) : handle(handle<U const, 'B'>{x}) {}
 
     T &operator[](long i) const noexcept { return _data[i]; }
 
@@ -352,7 +364,11 @@ namespace nda::mem {
 
   template <typename T> struct handle<T, 'B'> {
     private:
+
+    using U = std::remove_const_t<T>;
+
     handle<T, 'R'> const *_parent = nullptr; // Parent, Required for regular->shared promotion in Python Converter
+
     T *_data                      = nullptr; // Pointer to the start of the memory block
     size_t _size                  = 0;       // Size of the memory block. Invariant: size > 0 iif data != 0
 
@@ -361,14 +377,24 @@ namespace nda::mem {
 
     handle() = default;
     handle(T *ptr, size_t s) noexcept : _data(ptr), _size(s) {}
-    handle(handle<T, 'R'> const &x) noexcept : _parent(&x), _data(x.data()), _size(x.size()) {}
-    handle(handle<T, 'S'> const &x) noexcept : _data(x.data()), _size(x.size()) {}
+
+    handle(handle<U, 'R'> const &x) noexcept :  _data(x.data()), _size(x.size()) {}
+
+    //handle(handle<U, 'R'> const &x) noexcept : _parent(&x), _data(x.data()), _size(x.size()) {}
+
+    handle(handle<U, 'S'> const &x) noexcept : _data(x.data()), _size(x.size()) {}
+
+    handle(handle<U const, 'R'> const &x) noexcept :  _data(x.data()), _size(x.size()) {}
+
+    //handle(handle<U const, 'R'> const &x) noexcept : _parent(&x), _data(x.data()), _size(x.size()) {}
+
+    handle(handle<U const, 'S'> const &x) noexcept : _data(x.data()), _size(x.size()) {}
 
     T &operator[](long i) const noexcept { return _data[i]; }
 
     bool is_null() const noexcept { return _data == nullptr; }
 
-    handle<T, 'R'> const *parent() const { return _parent; }
+    //handle<T, 'R'> const *parent() const { return _parent; }
 
     // A const-handle does not entail T const data
     T *data() const noexcept { return _data; }

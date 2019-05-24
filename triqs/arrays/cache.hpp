@@ -32,7 +32,7 @@ namespace triqs {
       ml_t ml;
       std::conditional_t<IsConst, const_view_or_type_t<DataType>, view_or_type_t<DataType>> keeper;
       bool need_copy;
-      using CacheType         = array<typename DataType::value_type, DataType::domain_type::rank>;
+      using CacheType         = typename DataType::mutable_regular_type; //array<typename DataType::value_type, DataType::domain_type::rank>;
       using exposed_view_type = std::conditional_t<IsConst, typename CacheType::const_view_type, typename CacheType::view_type>;
       struct internal_data {
         CacheType copy;

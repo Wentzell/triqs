@@ -34,7 +34,7 @@ namespace triqs::gfs {
   template <typename Var, typename Target> class gf_const_view : is_view_tag, TRIQS_CONCEPT_TAG_NAME(GreenFunction) {
 
     using this_t = gf_const_view<Var, Target>; // used in common code
-    
+
     public:
     static constexpr bool is_view  = true;
     static constexpr bool is_const = true;
@@ -159,7 +159,7 @@ namespace triqs::gfs {
       */
     auto target_indices() const { return itertools::product_range(target().shape()); }
 
-    /** 
+    /**
        * Memorylayout of the data
        *
        * @category Accessors
@@ -223,16 +223,16 @@ namespace triqs::gfs {
 
     /**
        * Builds a const view on top of a mesh, a data array
-       * 
-       * @tparam ArrayType Type of the data array 
+       *
+       * @tparam ArrayType Type of the data array
        * @param dat Data array
        */
     template <typename ArrayType> gf_const_view(mesh_t m, ArrayType const &dat) : gf_const_view(impl_tag{}, std::move(m), dat, {}) {}
 
     /**
        * Builds a const view on top of a mesh, a data array
-       * 
-       * @tparam ArrayType Type of the data array 
+       *
+       * @tparam ArrayType Type of the data array
        * @param dat Data array
        * @param ind Indices
        */
@@ -273,7 +273,7 @@ namespace triqs::gfs {
 
     template <typename Fdata, typename Find> auto apply_on_data(Fdata &&fd, Find &&fi) {
       auto d2    = fd(_data);
-      using t2   = target_from_array<decltype(d2), arity>;
+      using t2   = target_from_array<std::decay_t<decltype(d2)>, arity>;
       using gv_t = gf_const_view<Var, t2>;
       return gv_t{_mesh, d2, fi(_indices)};
     }
@@ -284,7 +284,7 @@ namespace triqs::gfs {
 
     template <typename Fdata, typename Find> auto apply_on_data(Fdata &&fd, Find &&fi) const {
       auto d2    = fd(_data);
-      using t2   = target_from_array<decltype(d2), arity>;
+      using t2   = target_from_array<std::decay_t<decltype(d2)>, arity>;
       using gv_t = gf_const_view<Var, t2>;
       return gv_t{_mesh, d2, fi(_indices)};
     }

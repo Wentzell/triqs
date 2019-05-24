@@ -56,12 +56,12 @@ namespace triqs {
       static_assert(B_S == 'B' or B_S == 'S', "Internal error"); // REPLACE BY STRONG ENUM
 
       public:
-      using regular_type    = matrix<ValueType>;
-      using view_type       = matrix_view<ValueType, B_S, false>;
-      using const_view_type = matrix_view<ValueType, B_S, true>;
-      //using weak_view_type  = matrix_view<ValueType, true>;
-      using indexmap_type = typename IMPL_TYPE::indexmap_type;
-      using storage_type  = typename IMPL_TYPE::storage_type;
+      using regular_type         = matrix<ValueType>;
+      using mutable_regular_type = matrix<std::remove_const_t<ValueType>>;
+      using view_type            = matrix_view<ValueType, B_S, false>;
+      using const_view_type      = matrix_view<ValueType, B_S, true>;
+      using indexmap_type        = typename IMPL_TYPE::indexmap_type;
+      using storage_type         = typename IMPL_TYPE::storage_type;
 
       /// Build from an IndexMap and a storage
       template <typename S> matrix_view(typename IMPL_TYPE::indexmap_type const &Ind, S const &Mem) : IMPL_TYPE(Ind, Mem) {}
@@ -119,19 +119,20 @@ namespace triqs {
     };
 #undef IMPL_TYPE
 
-    template <typename ValueType> using matrix_const_view = matrix_view<ValueType, 'B', true>;
+    template <typename ValueType> using matrix_const_view = matrix_view<ValueType const, 'B', true>;
 
 // ---------------------- matrix --------------------------------
 #define IMPL_TYPE indexmap_storage_pair<indexmaps::cuboid::map<2>, nda::mem::handle<ValueType, 'R'>, false, false, 'B', Tag::matrix_view>
 
     template <typename ValueType> class matrix : Tag::matrix, TRIQS_CONCEPT_TAG_NAME(MutableMatrix), public IMPL_TYPE {
       public:
-      using value_type      = typename IMPL_TYPE::value_type;
-      using storage_type    = typename IMPL_TYPE::storage_type;
-      using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using regular_type    = matrix<ValueType>;
-      using view_type       = matrix_view<ValueType>;
-      using const_view_type = matrix_const_view<ValueType>;
+      using value_type           = typename IMPL_TYPE::value_type;
+      using storage_type         = typename IMPL_TYPE::storage_type;
+      using indexmap_type        = typename IMPL_TYPE::indexmap_type;
+      using regular_type         = matrix<ValueType>;
+      using mutable_regular_type = matrix<std::remove_const_t<ValueType>>;
+      using view_type            = matrix_view<ValueType>;
+      using const_view_type      = matrix_const_view<ValueType>;
       //using weak_view_type  = matrix_view<ValueType, true>;
 
       /// Empty matrix.

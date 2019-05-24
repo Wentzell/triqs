@@ -93,6 +93,7 @@ namespace triqs {
 
     /// invert the relation:  type, rank -> target.
     template <typename T, int R> struct _target_from_type_rank;
+    template <typename T, int R> struct _target_from_type_rank<T const, R> : _target_from_type_rank<T, R>{};
     template <int R> struct _target_from_type_rank<dcomplex, R> { using type = tensor_valued<R>; };
     template <> struct _target_from_type_rank<dcomplex, 2> { using type = matrix_valued; };
     template <> struct _target_from_type_rank<dcomplex, 0> { using type = scalar_valued; };

@@ -40,12 +40,12 @@ namespace triqs {
       static_assert(B_S == 'B', "Internal error"); // REPLACE BY STRONG ENUM
 
       public:
-      using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using storage_type    = typename IMPL_TYPE::storage_type;
-      using regular_type    = array<ValueType, Rank>;
-      using view_type       = array_view<ValueType, Rank, B_S, false>;
-      using const_view_type = array_view<ValueType, Rank, B_S, true>;
-      //using weak_view_type  = array_view<ValueType, Rank, true>;
+      using indexmap_type        = typename IMPL_TYPE::indexmap_type;
+      using storage_type         = typename IMPL_TYPE::storage_type;
+      using regular_type         = array<ValueType, Rank>;
+      using mutable_regular_type = array<std::remove_const_t<ValueType>, Rank>;
+      using view_type            = array_view<ValueType, Rank, B_S, false>;
+      using const_view_type      = array_view<ValueType, Rank, B_S, true>;
 
       /// Build from an IndexMap and a storage
       template <typename S> array_view(indexmap_type const &Ind, S const &Mem) : IMPL_TYPE(Ind, Mem) {}
@@ -112,7 +112,7 @@ namespace triqs {
     };
 #undef IMPL_TYPE
 
-    template <typename ValueType, int Rank> using array_const_view = array_view<ValueType, Rank, 'B', true>;
+    template <typename ValueType, int Rank> using array_const_view = array_view<ValueType const, Rank, 'B', true>;
 
     //------------------------------- array ---------------------------------------------------
 
@@ -120,12 +120,13 @@ namespace triqs {
 
     template <typename ValueType, int Rank> class array : Tag::array, TRIQS_CONCEPT_TAG_NAME(MutableArray), public IMPL_TYPE {
       public:
-      using value_type      = typename IMPL_TYPE::value_type;
-      using storage_type    = typename IMPL_TYPE::storage_type;
-      using indexmap_type   = typename IMPL_TYPE::indexmap_type;
-      using regular_type    = array<ValueType, Rank>;
-      using view_type       = array_view<ValueType, Rank>;
-      using const_view_type = array_const_view<ValueType, Rank>;
+      using value_type           = typename IMPL_TYPE::value_type;
+      using storage_type         = typename IMPL_TYPE::storage_type;
+      using indexmap_type        = typename IMPL_TYPE::indexmap_type;
+      using regular_type         = array<ValueType, Rank>;
+      using mutable_regular_type = array<std::remove_const_t<ValueType>, Rank>;
+      using view_type            = array_view<ValueType, Rank>;
+      using const_view_type      = array_const_view<ValueType, Rank>;
       //using weak_view_type  = array_view<ValueType, Rank, true>;
 
       /// Empty array.
