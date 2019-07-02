@@ -222,6 +222,21 @@ if(MSAN)
   target_link_libraries(triqs PUBLIC "-fsanitize=memory -fno-omit-frame-pointer -fsanitize-recover=all -fsanitize-memory-track-origins=2")
 endif()
 
+# ========= Thread Sanitizer ==========
+
+option(TSAN OFF "Compile library and executables with LLVM Thread Behavior Sanitizer")
+if(TSAN)
+  if(UBSAN OR ASAN)
+    message(FATAL_ERROR "The use of thread sanitizer is not compatible with ASAN or UBSAN")
+  endif()
+  target_compile_options(triqs PUBLIC -fsanitize=thread -fno-omit-frame-pointer -ggdb3)
+  target_link_libraries(triqs PUBLIC "-fsanitize=thread -fno-omit-frame-pointer")
+  if(NOT DEFINED ENV{TSAN_OPTIONS})
+    message(WARNING "TBSAN_OPTIONS is not set. Consider setting TBSAN_OPTIONS=symbolize=1:halt_on_error=1 when running tests")
+  endif()
+endif()
+
+
 # ---------------------------------
 # Triqs header include directories
 # ---------------------------------
