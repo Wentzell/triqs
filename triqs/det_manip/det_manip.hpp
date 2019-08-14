@@ -90,8 +90,8 @@ namespace triqs {
       uint64_t n_opts                  = 0;   // count the number of operation
       uint64_t n_opts_max_before_check = 100; // max number of ops before the test of deviation of the det, M^-1 is performed.
       double singular_threshold = -1; // the test to see if the matrix is singular is abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))
-      double precision_warning = 1.e-8; // bound for warning message in check for singular matrix
-      double precision_error = 1.e-5; // bound for throwing error in check for singular matrix
+      double precision_warning  = 1.e-8; // bound for warning message in check for singular matrix
+      double precision_error    = 1.e-5; // bound for throwing error in check for singular matrix
 
       private:
       //  ------------     BOOST Serialization ------------
@@ -139,7 +139,6 @@ namespace triqs {
       }
 
       private:
-      // temporary work data, not saved, serialized, etc....
       struct work_data_type1 {
         x_type x;
         y_type y;
@@ -159,23 +158,37 @@ namespace triqs {
         }
       };
 
-      struct work_data_type2 {
-        x_type x[2];
-        y_type y[2];
-        // MB = A^(-1)*B,
-        // MC = C*A^(-1)
-        matrix_type MB, MC, B, C, ksi;
-        size_t i[2], j[2], ireal[2], jreal[2];
-        void reserve(size_t s) {
-          MB.resize(s, 2);
-          MC.resize(2, s);
-          B.resize(s, 2), C.resize(2, s);
-          ksi.resize(2, 2);
-          MB() = 0;
-          MC() = 0;
-        }
-        value_type det_ksi() const { return ksi(0, 0) * ksi(1, 1) - ksi(1, 0) * ksi(0, 1); }
+      template <int N> struct work_data_type {
+	x_type x[N];
+	y_type y[N];
+	// MB = A^(-1)*B,
+	// MC = C*A^(-1)
+	arrays::matrix<value_type> MB, MC, B, C, ksi;
+	size_t i[N], j[N], ireal[N], jreal[N];
+	void reserve(size_t s) {
+	  MB.resize(s, N);
+	  MC.resize(N, s);
+	  B.resize(s, N), C.resize(N, s);
+	  ksi.resize(N, N);
+	  MB() = 0;
+	  MC() = 0;
+	}
+	inline value_type det_ksi() const {
+	  if constexpr (N == 2) {
+	    return ksi(0, 0) * ksi(1, 1) - ksi(1, 0) * ksi(0, 1);
+	  } else if constexpr (N == 3) {
+	    std::abort();
+	  } else if constexpr (N == 3) {
+	    std::abort();
+	  } else {
+	    std::abort();
+	  }
+	}
       };
+
+      using work_data_type2 = work_data_type<2>;
+      using work_data_type3 = work_data_type<3>;
+      using work_data_type4 = work_data_type<4>;
 
       struct work_data_type_refill {
         std::vector<x_type> x_values;
@@ -269,7 +282,7 @@ namespace triqs {
 
       /// Set the bound for throwing error in the singular tests
       void set_precision_error(double threshold) { precision_error = threshold; }
-      
+
       /**
      * @brief Constructor.
      *
@@ -1184,9 +1197,7 @@ namespace triqs {
         sign = (s > 0 ? 1 : -1);
       }
 
-      void check_mat_inv() {
-        _regenerate_with_check(true, precision_warning, precision_error);
-      }
+      void check_mat_inv() { _regenerate_with_check(true, precision_warning, precision_error); }
 
       /// it the det 0 ? I.e. (singular_threshold <0 ? not std::isnormal(std::abs(det)) : (std::abs(det)<singular_threshold))
       bool is_singular() const { return (singular_threshold < 0 ? not std::isnormal(std::abs(det)) : (std::abs(det) < singular_threshold)); }
