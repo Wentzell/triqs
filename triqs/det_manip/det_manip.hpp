@@ -159,31 +159,31 @@ namespace triqs {
       };
 
       template <int N> struct work_data_type {
-	x_type x[N];
-	y_type y[N];
-	// MB = A^(-1)*B,
-	// MC = C*A^(-1)
-	arrays::matrix<value_type> MB, MC, B, C, ksi;
-	size_t i[N], j[N], ireal[N], jreal[N];
-	void reserve(size_t s) {
-	  MB.resize(s, N);
-	  MC.resize(N, s);
-	  B.resize(s, N), C.resize(N, s);
-	  ksi.resize(N, N);
-	  MB() = 0;
-	  MC() = 0;
-	}
-	inline value_type det_ksi() const {
-	  if constexpr (N == 2) {
-	    return ksi(0, 0) * ksi(1, 1) - ksi(1, 0) * ksi(0, 1);
-	  } else if constexpr (N == 3) {
-	    std::abort();
-	  } else if constexpr (N == 3) {
-	    std::abort();
-	  } else {
-	    std::abort();
-	  }
-	}
+        x_type x[N];
+        y_type y[N];
+        // MB = A^(-1)*B,
+        // MC = C*A^(-1)
+        arrays::matrix<value_type> MB, MC, B, C, ksi;
+        size_t i[N], j[N], ireal[N], jreal[N];
+        void reserve(size_t s) {
+          MB.resize(s, N);
+          MC.resize(N, s);
+          B.resize(s, N), C.resize(N, s);
+          ksi.resize(N, N);
+          MB() = 0;
+          MC() = 0;
+        }
+        inline value_type det_ksi() const {
+          if constexpr (N == 2) {
+            return ksi(0, 0) * ksi(1, 1) - ksi(1, 0) * ksi(0, 1);
+          } else if constexpr (N == 3) {
+            return arrays::determinant(ksi);
+          } else if constexpr (N == 3) {
+            return arrays::determinant(ksi);
+          } else {
+            std::abort();
+          }
+        }
       };
 
       using work_data_type2 = work_data_type<2>;
