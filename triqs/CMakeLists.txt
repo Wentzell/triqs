@@ -26,6 +26,8 @@ target_link_libraries(triqs PRIVATE cpp2py python_and_numpy)
 target_compile_options(triqs PUBLIC
   -std=c++17
   $<$<CXX_COMPILER_ID:GNU>:-fconcepts>
+  $<$<CXX_COMPILER_ID:GNU>:-fdiagnostics-color>
+  $<$<CXX_COMPILER_ID:Clang>:-fcolor-diagnostics>
 )
 
 if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin") AND ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang"))
@@ -35,10 +37,6 @@ endif()
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
   target_compile_definitions(triqs PRIVATE TRIQS_DEBUG NDA_DEBUG)
 endif()
-
-# enforce color diagnostics ?
-# gcc : -fdiagnostics-color
-# clang :  -fcolor-diagnostics 
 
 # ---------------------------------
 # Turn the memory check
